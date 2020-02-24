@@ -1,32 +1,39 @@
 # Parallel-Computing-MapReduce
-For this assignment you will write a parallel map reduce program. The program will search for a set 
-of words among a set of documents that constitute the works of Shakespeare. The set of words is listed 
-below. The assignment should use the map-reduce design pattern to split up the work. You should have
-functions that count the number of a specific word within a specific document and combine the individual
-word counts.
+This assignment implements a parallel map-reduce design pattern. The program will search for a set of words:
 
-The program should output the total instances of all words and the counts for each individual word
-
-Word list:
 hate, love, death, night, sleep, time, henry, hamlet, you, my, blood, poison, macbeth, king, heart, honest
 
-Once completed the repository should contain your code, a short report, and any instructions needed to run your code.
+among a set of documents that constitute the works of Shakespeare. 
 
-Hints: 
-* Its easier to load all the files containing text before entering the processing region
-* Some of the variables will need to be locked before updating, otherwise a difficult to debug race condition may occure
-* This will take multiple loops (functions would be better though), you can iterate over the list of words
+The programcount the number of a specific word within a specific document and combine the individual word counts.It will output the total instances of all words and the counts for each individual word
 
-## Requirements 
+##Instructions
+Run:
+python mapreduce.py 
 
-Write a serial matrix multiply program in Python. The could should use reasonable decomposition, use reasonable variable names, and should generally follow good coding standards. Important, your assignment should include your name. 
+To change the number of threads used:
+Change the number of threads in pymp.Parallel() in the code
 
-The program shall count the number of each instances of each word for the set of documents, and the total of count of all words in the list
+##Issues encountered:
+I began coding the assignment using one thread, and when it worked, I added another and came accross deadlock.
 
-The program shall use PyMP to compute the number of words in parallel
+##How I overcame some problems:
+Still trying to resolve deadlock issues.
 
-The program shall time how long overall operation takes and how long the word count and file reading operations take individually
+##Bugs in program:
+No bugs
 
-The program shall include any necessary instructions to properly run the program 
+##How long it took me to complete this assignment:
+So far it's taken 3 hours. The longest part was figuring out the way I wanted to parse the text and look for the words.
 
-The assignment shall be submitted through github 
+##Performance Measurements:
+
+
+##Increasing # of Threads:
+
+
+##Observations:
+
+
+##Output of cpuInfoDump.sh:
+Intel(R) Core(TM) i7-7560U CPU @ 2.40GHz 4 -- 36 -- 216
