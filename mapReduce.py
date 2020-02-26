@@ -11,31 +11,52 @@ import time
 import pymp
 import re
 
-#
-def dictOfItems(filesToIterate, wordList, dictOfWords):
-
-    with pymp.Parallel(2) as p:
+def dictOfItems(linesToIterate, wordList):
+    
+    # create a shared dict
+    dictOfWords = pymp.shared.dict()
+    #initialize dictionary with WordList
+    #for i in wordList:
+    #    dictOfWords[i] = 0
+            
+    with pymp.Parallel(1) as p:
+       
+        for i in wordList:
+            dictOfWords[i] = 0
+            
+        localDictOfWords = {}
         
+        #get a lock for this parallel region
+        sumLock = p.lock
         # iterate over the list of items
-        for file in p.iterate(filesToIterate):
-            for line in file: 
-                # get a lock for this parallel region
-                sumLock = p.lock
-                # Remove the leading spaces and newline character 
-                # Convert the characters in line to  
-                # lowercase to avoid case mismatch 
-                line = line.strip().lower()
-                # Split the line into words 
-                line = re.sub(r"[^a-zA-Z0-9]+", ' ', line)
-                # for each item take that item and
-                line = line.split()
-                # search for words
-                for item in line: #for each word in list of words
-                    for word in wordList:
-                        if (word == item):
-                            sumLock.acquire() # lock any other thread from accessing shared dictionary
-                            dictOfWords[word] += 1
-                            sumLock.release() # release lock when done
+        for line in p.iterate(linesToIterate):
+            for i in wordList:
+                localDictOfWords[i] = 0
+            #print('help1')
+            #if p.thread_num is not 1:
+            #p.print("Calculating from thread {} of {}".format(p.thread_num, p.num_threads))
+            #print('help2')
+            # Remove the leading spaces and newline character 
+            # Convert the characters in line to  
+            # lowercase to avoid case mismatch 
+            line = line.strip().lower()
+            # Split the line into words 
+            line = re.sub(r"[^a-zA-Z0-9]+", ' ', line)
+            # for each item take that item and
+            line = line.split()
+            # search for words
+            for item in line: #for each word in list of words
+                for word in wordList:
+                    if (word == item):
+                        #sumLock.acquire() # lock any other thread from accessing shared dictionary
+                        localDictOfWords[word] += 1
+                        #sumLock.release() # release lock when done
+            for word in wordList:
+                sumLock.acquire() # lock any other thread from accessing shared dictionary
+                dictOfWords[word] += localDictOfWords[word]
+                sumLock.release() # release lock when done
+        p.print("Launching thread {} of {}".format(p.thread_num, p.num_threads))
+
 
     return dictOfWords
 
@@ -54,28 +75,68 @@ def main():
     """
     
     #opening all shakespeare files
-    infile1 = open('shakespeare1.txt',"r")
-    infile2 = open('shakespeare2.txt',"r")
-    infile3 = open('shakespeare3.txt',"r")
-    infile4 = open('shakespeare4.txt',"r")
-    infile5 = open('shakespeare5.txt',"r")
-    infile6 = open('shakespeare6.txt',"r")
-    infile7 = open('shakespeare7.txt',"r")
-    infile8 = open('shakespeare8.txt',"r")
+    #infile1 = open('shakespeare1.txt',"r")
+    linesToIterate = []
     
-    filesToIterate = [infile1, infile2, infile3, infile4,
-                      infile5, infile6, infile7, infile8]
+    with open('shakespeare1.txt',"r") as file:
+        text = ""
+        for line in file:
+            text = text + line
+        linesToIterate.append( text )
+    with open('shakespeare2.txt',"r") as file:
+        text = ""
+        for line in file:
+            text = text + line
+        linesToIterate.append( text )
+    with open('shakespeare3.txt',"r") as file:
+        text = ""
+        for line in file:
+            text = text + line
+        linesToIterate.append( text )
+    with open('shakespeare4.txt',"r") as file:
+        text = ""
+        for line in file:
+            text = text + line
+        linesToIterate.append( text )
+    with open('shakespeare5.txt',"r") as file:
+        text = ""
+        for line in file:
+            text = text + line
+        linesToIterate.append( text )
+    with open('shakespeare6.txt',"r") as file:
+        text = ""
+        for line in file:
+            text = text + line
+        linesToIterate.append( text )
+    with open('shakespeare7.txt',"r") as file:
+        text = ""
+        for line in file:
+            text = text + line
+        linesToIterate.append( text )
+    with open('shakespeare8.txt',"r") as file:
+        text = ""
+        for line in file:
+            text = text + line
+        linesToIterate.append( text )
+
     
     wordlist = ["hate", "love", "death", "night", "sleep", "time",
                 "henry", "hamlet", "you", "my", "blood", "poison", 
                 "macbeth", "king", "heart", "honest"]
+
+    #print(linesToIterate)
+    #starting timer
+    start = time.time()
+
+    dictOfWords = dictOfItems(linesToIterate,wordlist)
     
-    # create a shared dict
-    dictOfWords = pymp.shared.dict()
-    dictOfWords = { i : 0 for i in wordlist}
-    
-    dictOfWords = dictOfItems(filesToIterate,wordlist, dictOfWords)
-    
+    #stopping timer
+    stop_time = time.time() - start
+
+    print("time: ")
+    print("%s seconds" % stop_time)
+    print("\n")
+
     printResults(dictOfWords)
 
 if __name__ == '__main__':
